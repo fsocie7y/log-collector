@@ -5,35 +5,40 @@ import asyncio
 from aiogram import Bot, Dispatcher, F
 from aiogram.types import Message
 from aiogram.filters import Command
+from aiogram.fsm.storage.memory import MemoryStorage
+
 from dotenv import load_dotenv
 
-from log_processor import display_all_logs_in_the_directory
+from states import lc_router
+from keyboards import main_kb
 
 load_dotenv()
 
-bot = Bot(os.getenv("BOT_TOKEN"))
-dp = Dispatcher()
+storage = MemoryStorage()
+bot = Bot(os.getenv("BOT_TOKEN"), parse_mode="HTML")
+dp = Dispatcher(bot=bot, storage=storage)
+dp.include_router(lc_router)
 
 
 @dp.message(Command("start"))
-async def cmd_start(message: Message):
+async def cmd_start(message: Message) -> None:
     await message.answer(f"{message.from_user.first_name} wellcome to Log Collector bot!\n"
-                         f"Please enter absolute path to directory that you want to check.\n"
-                         f"Or separate path by spaces.")
+                         f"U can see what options i have by typing <b>'/menu'</b> or click button below!",
+                         reply_markup=main_kb)
 
 
-@dp.message()
-async def echo(message: Message):
-    print(message.text)
+@dp.message(Command("menu"))
+async def menu(message: Message) -> None:
+    await message.answer(
+        "I have such options:\n"
+        "Log collection by directory - /collect_logs\n"
+        "Analyzing log-file - /analyze_logs\n"
+        "Menu - /menu",
+        reply_markup=main_kb
+    )
 
-    search_log_res = display_all_logs_in_the_directory(message.text)
-    if isinstance(search_log_res, list):
-        await message.answer("\n".join(search_log_res))
-    elif isinstance(search_log_res, str):
-        await message.answer(search_log_res)
 
-
-async def main():
+async def main() -> None:
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)
 
