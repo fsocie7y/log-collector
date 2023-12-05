@@ -58,5 +58,5 @@ def google_helper(search_query: str) -> search:
     return search_results
 
 
-searchfor = "Sat Dec 02 00:01:46 2023 UTC - Failed loading shell32.dll, not hooking ShellExecute calls"
-google_helper(searchfor)
+# searchfor = "Sat Dec 02 00:01:46 2023 UTC - Failed loading shell32.dll, not hooking ShellExecute calls"
+# google_helper(searchfor)
