@@ -73,10 +73,10 @@ def read_log_file(filename: str) -> str|list:
 def google_helper(search_query: str) -> search:
 
     print("Processing Your Requests...")
-    search_results = search(search_query, num_results=5)
-    for result in search_results:
-        print(result)
-
+    # search_results = search(search_query, num_results=5)
+    # for result in search_results:
+    #     print(result)
+    search_results = "some help"
     return search_results
 
 
