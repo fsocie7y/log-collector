@@ -2,7 +2,7 @@ import os
 
 import asyncio
 
-from aiogram import Bot, Dispatcher, F
+from aiogram import Bot, Dispatcher
 from aiogram.types import Message
 from aiogram.filters import Command
 from aiogram.fsm.storage.memory import MemoryStorage
@@ -22,9 +22,11 @@ dp.include_router(lc_router)
 
 @dp.message(Command("start"))
 async def cmd_start(message: Message) -> None:
-    await message.answer(f"{message.from_user.first_name} wellcome to Log Collector bot!\n"
-                         f"U can see what options i have by typing <b>'/menu'</b> or click button below!",
-                         reply_markup=main_kb)
+    await message.answer(
+        f"{message.from_user.first_name} wellcome to Log Collector bot!\n"
+        f"U can see what options i have by typing <b>'/menu'</b> or click button below!",
+        reply_markup=main_kb
+    )
 
 
 @dp.message(Command("menu"))

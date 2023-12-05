@@ -1,9 +1,11 @@
 import os
 import re
+
+from dotenv import load_dotenv
 from googlesearch import search
+from openai import OpenAI
 
-
-direct = "D:\\"
+load_dotenv()
 
 
 def display_all_logs_in_the_directory(directory: str) -> list | str:
@@ -27,15 +29,10 @@ def display_all_logs_in_the_directory(directory: str) -> list | str:
                     result_paths.append(res)
 
         return result_paths
-    else:
-        return "This folder path does not exists, please try something else!"
+    return "This folder path does not exists, please try something else!"
 
 
-# for log_file in display_all_logs_in_the_directory(direct):
-#     print("Found file", log_file)
-
-
-def read_log_file(filename: str) -> str|list:
+def read_log_file(filename: str) -> str | list:
     if "\\" in filename:
         file_path = filename.split("\\")
     else:
@@ -54,7 +51,7 @@ def read_log_file(filename: str) -> str|list:
         errors = list()
         err_found = False
 
-        err_messages = ("error", "faile", "dropped")
+        err_messages = ("error", "fail", "dropped")
         for string in lst_str:
             if any(error in string.lower() for error in err_messages):
                 print("Error found")
@@ -67,18 +64,27 @@ def read_log_file(filename: str) -> str|list:
         return errors
 
 
-# read_log_file("D:\\Steam\GameOverlayRenderer.log")
-
-
-def google_helper(search_query: str) -> search:
-
+def helper(issue_query: str) -> search:
+    client = OpenAI(
+        api_key=os.environ.get("OPENAI_API_KEY"),
+    )
     print("Processing Your Requests...")
-    # search_results = search(search_query, num_results=5)
-    # for result in search_results:
-    #     print(result)
-    search_results = "some help"
+    completion = client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {
+                "role": "system",
+                "content": "You are a computer engineering assistant,"
+                           " skilled in explaining complex programming problems and resolving traceback errors."
+                           "Please, help to resolve following issues."
+            },
+            {
+                "role": "user",
+                "content": issue_query
+            }
+        ]
+    )
+
+    search_results = completion.choices[0].message.content
+    print(search_results)
     return search_results
-
-
-# searchfor = "Sat Dec 02 00:01:46 2023 UTC - Failed loading shell32.dll, not hooking ShellExecute calls"
-# google_helper(searchfor)

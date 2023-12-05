@@ -1,14 +1,12 @@
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
-from aiogram.types import (InlineKeyboardMarkup,
-                           InlineKeyboardButton,
-                           Message)
+from aiogram.types import Message
 from aiogram.filters import Command
 from aiogram import Router, F
 
 from log_processor import (display_all_logs_in_the_directory,
                            read_log_file,
-                           google_helper)
+                           helper)
 from keyboards import y_n, main_kb
 
 lc_router = Router()
@@ -26,9 +24,7 @@ class FSMLogAnalyzer(StatesGroup):
 @lc_router.message(Command("cancel"))
 @lc_router.message(F.text.casefold() == "cancel")
 async def cancel_handler(message: Message, state: FSMContext) -> None:
-    """
-    Allow user to cancel any action
-    """
+
     current_state = await state.get_state()
     if current_state is None:
         return
@@ -92,6 +88,7 @@ async def process_dont_need_help(message: Message, state: FSMContext) -> None:
     await state.clear()
     await message.answer(
         "Not bad not terrible.\nSee you soon.",
+        reply_markup=main_kb
     )
 
 
@@ -100,9 +97,11 @@ async def process_need_help(message: Message, state: FSMContext) -> None:
     data = await state.get_data()
     issue = data.get("issue")
     await state.clear()
+    await message.answer("Processing Your Requests...")
     await message.answer(
-        f"This will help u to solve issue)\n"
-        f"{google_helper(issue)}"
+        f"This will help u to solve issue)\n\n"
+        f"{helper(issue)}",
+        reply_markup=main_kb
     )
 
 
