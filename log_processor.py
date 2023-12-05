@@ -7,8 +7,13 @@ direct = "D:\\"
 
 
 def display_all_logs_in_the_directory(directory: str) -> list | str:
+    if directory.endswith(".log"):
+        return "Enter the path to directory not to log-file!"
+
     directory = re.findall("\w+", directory)
-    if len(directory[0]) == 1: directory[0] += ":\\"
+    if len(directory[0]) == 1:
+        directory[0] += ":\\"
+
     dir_path = "\\".join(directory)
     print("Dir path", dir_path)
 
@@ -30,22 +35,39 @@ def display_all_logs_in_the_directory(directory: str) -> list | str:
 #     print("Found file", log_file)
 
 
-def read_log_file(filename):
-    with open(filename, "r") as file:
+def read_log_file(filename: str) -> str|list:
+    if "\\" in filename:
+        file_path = filename.split("\\")
+    else:
+        file_path = filename.split(" ")
+
+    if len(file_path[0]) == 1 or file_path[0].endswith(":"):
+        file_path[0] = file_path[0][0] + ":\\"
+
+    file_path = os.path.join(*file_path)
+    print(file_path)
+
+    with open(file_path, "r") as file:
         lst_str = file.readlines()
         print(lst_str)
+
+        errors = list()
         err_found = False
+
         err_messages = ("error", "faile", "dropped")
         for string in lst_str:
             if any(error in string.lower() for error in err_messages):
                 print("Error found")
                 err_found = True
+                errors.append(string)
                 print("Error: ", string)
+
         if not err_found:
-            print("Everything is ok! This file has no information about errors.")
+            return "Everything is ok! This file has no information about errors."
+        return errors
 
 
-# read_log_file(direct)
+# read_log_file("D:\\Steam\GameOverlayRenderer.log")
 
 
 def google_helper(search_query: str) -> search:
